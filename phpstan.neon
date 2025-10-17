@@ -1,0 +1,22 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - database
+        - routes
+        - tests
+
+    level: 6
+
+    # ✅ Ignore specific type warnings safely
+    ignoreErrors:
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics
+
+    # Optional: disable errors if a pattern isn't matched
+    reportUnmatchedIgnoredErrors: false
+
+    checkModelProperties: true
+    checkOctaneCompatibility: false
