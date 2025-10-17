@@ -62,6 +62,12 @@ services:
       - N8N_PORT=5678
       - WEBHOOK_URL=http://n8n.localhost:5678/
       - GENERIC_TIMEZONE=Europe/Sofia
+      - N8N_FEATURES_AI_AGENTS_ENABLED=true
+      - N8N_HMAC_SECRET=super_secret_shared_key
+      # Optional but recommended
+      - NODE_ENV=production
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_SECURE_COOKIE=false
     volumes:
       - ./n8n_data:/home/node/.n8n
     networks:
