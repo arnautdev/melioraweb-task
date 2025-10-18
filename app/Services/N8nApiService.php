@@ -24,7 +24,7 @@ class N8nApiService
             . '/' . ltrim(config('services.n8n.webhook_path'), '/');
 
         $token = request()->user()->createToken('n8n-webhook')->plainTextToken;
-        $response = Http::asJson()
+        Http::asJson()
             ->timeout((int)config('http.timeout', 20))
             ->retry((int)config('http.retries', 2), 500)
             ->withHeaders([
@@ -32,8 +32,6 @@ class N8nApiService
             ])
             ->post($webhookUrl, $payload)
             ->throw();
-
-        \Log::debug($response);
     }
 
 }

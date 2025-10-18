@@ -21,6 +21,7 @@ class AdScriptTaskService extends BaseService
                 throw new \RuntimeException('Error while updating task.');
             }
 
+            /// trigger broadcast event to update UI
             event(new AdScriptTaskUpdated($task));
 
             return $task->fresh();

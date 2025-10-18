@@ -19,7 +19,6 @@ class AddScriptTasks extends Component
 
     public function loadTasks(): void
     {
-        \Log::debug(__METHOD__);
         $this->adTasks = AdScriptTask::latest()->take(10)->get();
     }
 
