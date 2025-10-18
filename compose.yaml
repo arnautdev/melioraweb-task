@@ -1,11 +1,11 @@
 services:
   melioraweb.test:
     build:
-      context: './vendor/laravel/sail/runtimes/8.4'
+      context: ./docker/8.4
       dockerfile: Dockerfile
       args:
         WWWGROUP: '${WWWGROUP}'
-    image: 'sail-8.4/app'
+    image: sail-8.4/app
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     ports:
@@ -19,6 +19,7 @@ services:
       IGNITION_LOCAL_SITES_PATH: '${PWD}'
     volumes:
       - '.:/var/www/html'
+      - './docker/8.4/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf'
     networks:
       - sail
     depends_on:
@@ -37,7 +38,7 @@ services:
       MYSQL_EXTRA_OPTIONS: '${MYSQL_EXTRA_OPTIONS}'
     volumes:
       - 'sail-mysql:/var/lib/mysql'
-      - './vendor/laravel/sail/database/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+      - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
     networks:
       - sail
     healthcheck:
@@ -49,33 +50,48 @@ services:
       retries: 3
       timeout: 5s
   n8n:
-    image: n8nio/n8n:latest
+    image: 'n8nio/n8n:latest'
     container_name: n8n
     restart: unless-stopped
     ports:
-      - "5678:5678"
+      - '5678:5678'
     environment:
       - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-secret}
+      - 'N8N_BASIC_AUTH_USER=${N8N_USER:-admin}'
+      - 'N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-secret}'
       - N8N_HOST=n8n.localhost
       - N8N_PORT=5678
-      - WEBHOOK_URL=http://n8n.localhost:5678/
+      - 'WEBHOOK_URL=http://n8n.localhost:5678/'
       - GENERIC_TIMEZONE=Europe/Sofia
       - N8N_FEATURES_AI_AGENTS_ENABLED=true
       - N8N_HMAC_SECRET=super_secret_shared_key
-      # Optional but recommended
       - NODE_ENV=production
       - N8N_DIAGNOSTICS_ENABLED=false
       - N8N_SECURE_COOKIE=false
     volumes:
-      - ./n8n_data:/home/node/.n8n
+      - './n8n_data:/home/node/.n8n'
     networks:
       - sail
-
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - '${FORWARD_REDIS_PORT:-6379}:6379'
+    volumes:
+      - 'sail-redis:/data'
+    networks:
+      - sail
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      retries: 3
+      timeout: 5s
 networks:
   sail:
     driver: bridge
 volumes:
   sail-mysql:
+    driver: local
+  sail-redis:
     driver: local

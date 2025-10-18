@@ -1,6 +1,8 @@
 <?php
 
+use App\Events\AdScriptTaskUpdated;
 use App\Http\Controllers\ProfileController;
+use App\Models\AdScriptTask;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +19,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return to_route('login');
 });
+
+Route::get('/trigger-example', function () {
+    event(new AdScriptTaskUpdated(AdScriptTask::first()));
+});
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');

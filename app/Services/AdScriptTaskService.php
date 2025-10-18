@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Application\Enums\AdScriptTaskStatusEnum;
+use App\Events\AdScriptTaskUpdated;
 use App\Models\AdScriptTask;
 use Illuminate\Database\QueryException;
 
@@ -16,13 +17,17 @@ class AdScriptTaskService extends BaseService
 
             $task->fill($data);
 
-            $task->save();
+            if (!$task->save()) {
+                throw new \RuntimeException('Error while updating task.');
+            }
+
+            event(new AdScriptTaskUpdated($task));
 
             return $task->fresh();
         } catch (QueryException $exception) {
             $this->logDbError($exception);
 
-            throw new \RuntimeException('Database error while creating log.');
+            throw new \RuntimeException('Database error while creating task.');
         }
     }
 
@@ -33,14 +38,14 @@ class AdScriptTaskService extends BaseService
             $task->fill($data);
 
             if (!$task->save()) {
-                throw new \RuntimeException('Error while creating log.');
+                throw new \RuntimeException('Error while creating task.');
             }
 
             return $task->fresh();
         } catch (QueryException $exception) {
             $this->logDbError($exception);
 
-            throw new \RuntimeException('Database error while creating log.');
+            throw new \RuntimeException('Database error while creating task.');
         }
     }
 }

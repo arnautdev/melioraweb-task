@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('url');
             $table->string('ip')->index();
             $table->string('user_id')->nullable()->index();
-            $table->string('headers');
+            $table->json('headers');
             $table->json('body');
             $table->string('response_status')->index();
             $table->json('response_body');

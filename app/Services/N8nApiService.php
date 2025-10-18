@@ -20,14 +20,16 @@ class N8nApiService
             'callback_url' => route('api.ad-scripts.result', $task->id)
         ];
 
-        logger($payload);
-
         $webhookUrl = rtrim(config('services.n8n.base_url'), '/')
             . '/' . ltrim(config('services.n8n.webhook_path'), '/');
 
+        $token = request()->user()->createToken('n8n-webhook')->plainTextToken;
         $response = Http::asJson()
             ->timeout((int)config('http.timeout', 20))
             ->retry((int)config('http.retries', 2), 500)
+            ->withHeaders([
+                'Authorization' => "Bearer {$token}",
+            ])
             ->post($webhookUrl, $payload)
             ->throw();
 

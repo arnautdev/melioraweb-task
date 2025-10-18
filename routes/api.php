@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\LogApiRequests;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AdScriptTaskController;
 
@@ -14,8 +15,7 @@ use App\Http\Controllers\Api\AdScriptTaskController;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', LogApiRequests::class])->group(function () {
     Route::post('/add-scripts', [AdScriptTaskController::class, 'store'])->name('add-scripts');
+    Route::post('/add-scripts/{id}/result', [AdScriptTaskController::class, 'result'])->name('ad-scripts.result');
 });
-
-Route::post('/add-scripts/{id}/result', [AdScriptTaskController::class, 'result'])->name('ad-scripts.result');
